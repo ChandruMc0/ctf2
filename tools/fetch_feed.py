@@ -47,7 +47,25 @@ def playlist_urls():
     return segs
 
 
+def probe():
+    names = [
+        "", "boardroom", "live", "stream", "mic", "drop", "implant", "exfil",
+        "covert", "audio", "room", "meeting", "av", "bridge", "feed", "secret",
+        "flag", "cam", "camera", "board", "conference", "ultrasonic", "whisper",
+    ]
+    print("PROBE")
+    for name in names:
+        url = "https://web-fc7f65a00530436c.web.h7tex.com/" + (f"{name}/index.m3u8" if name else "index.m3u8")
+        try:
+            data, hdrs = fetch(url + f"?bust={int(time.time())}", timeout=12)
+            text = data[:180].decode("utf-8", "replace").replace("\n", " | ")
+            print(f"  {name or '/'} {hdrs.get('Content-Type')} {len(data)} {text}")
+        except Exception as e:
+            print(f"  {name or '/'} ERR {e}")
+
+
 def main():
+    probe()
     seen = {}
     deadline = time.time() + 50
     while time.time() < deadline and len(seen) < 12:

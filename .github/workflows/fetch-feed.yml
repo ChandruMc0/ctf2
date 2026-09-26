@@ -5,19 +5,29 @@ on:
       - "tools/fetch_feed.py"
       - ".github/workflows/fetch-feed.yml"
 permissions:
-  contents: read
+  contents: write
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: tools
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg tesseract-ocr python3-numpy python3-pil
       - name: analyze
         run: python3 tools/fetch_feed.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: feed-analysis
-          path: analysis-out/
-          if-no-files-found: error
+      - name: ocr
+        run: |
+          cd analysis-out
+          for f in spectrogram*.png; do
+            echo "==== OCR $f"
+            tesseract "$f" stdout --psm 6 || true
+          done | tee ocr.txt
+      - name: publish
+        run: |
+          rm -f analysis-out/*.ts analysis-out/feed.ts
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add analysis-out
+          git commit -m "feed analysis output" || exit 0
+          git push
