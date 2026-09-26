@@ -9,7 +9,7 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: tools
@@ -25,9 +25,9 @@ jobs:
           done | tee ocr.txt
       - name: publish
         run: |
-          rm -f analysis-out/*.ts analysis-out/feed.ts
+          rm -f analysis-out/*.ts analysis-out/feed.ts analysis-out/*.wav analysis-out/*.png
           git config user.email "actions@github.com"
           git config user.name "github-actions[bot]"
-          git add analysis-out
+          git add analysis-out/symbols.txt analysis-out/decode.txt analysis-out/playlist.m3u8 || true
           git commit -m "feed analysis output" || exit 0
           git push
