@@ -202,7 +202,7 @@ def main():
                 (OUT / name).write_bytes(data)
         except Exception as e:
             print("FETCH_ERR", type(e).__name__, e)
-        if len(seen) >= 12:
+        if len(seen) >= 80:
             break
         time.sleep(4)
 
