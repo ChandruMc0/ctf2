@@ -1,0 +1,23 @@
+name: fetch-feed
+on:
+  push:
+    paths:
+      - "tools/fetch_feed.py"
+      - ".github/workflows/fetch-feed.yml"
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: tools
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: analyze
+        run: python3 tools/fetch_feed.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feed-analysis
+          path: analysis-out/
+          if-no-files-found: error
